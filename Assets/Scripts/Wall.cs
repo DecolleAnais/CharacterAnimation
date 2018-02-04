@@ -21,7 +21,7 @@ public class Wall : MonoBehaviour {
             for(int x = 0;x < m_width;x++)
             {
                 // brick from transform field (brick prefab)
-                Instantiate(brick, new Vector3(x *width, y * height, 0) + transform.position, Quaternion.identity);
+                Instantiate(brick, new Vector3(x * width, y * height, 0) + transform.position, Quaternion.identity);
 
                 /*
                 //GameObject cube = (GameObject)AssetData ;

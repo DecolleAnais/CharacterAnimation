@@ -91,6 +91,26 @@ public class PlayAnimationEditor : EditorWindow
         //    Si la togglebox est cochée
         //       Parcourir tous les points de la trajectoire et les afficher
         // Vous pourrez appeler la fonction de dessin d'un point et/ou Handles.DrawLine(l_oldPoint, l_currentPoint);
+        
+        if(m_toggleTraj != null && m_trajectories != null)
+        {
+            Handles.color = Color.red;
+            // foreach toggle
+            foreach(KeyValuePair<string, bool> toggle in m_toggleTraj)
+            {
+                // if the toggle is true
+                if (toggle.Value)
+                {
+                    // draw the trajectory points
+                    List<Vector3> points = m_trajectories[toggle.Key];
+                    for(int i = 0;i < points.Count - 1;i++)
+                    {
+                        Handles.DrawLine(points[i], points[i + 1]);
+                    }
+                }
+            }
+        }
+        
     }
 
 
@@ -103,7 +123,92 @@ public class PlayAnimationEditor : EditorWindow
         // Remplir le m_trajectories[m_BodyJoints[i].name] avec les positions des points
         // Voir AnimationMode.BeginSampling(); .... AnimationMode.EndSampling(); qui se trouve dans playAnimation
 
+        // create or clean the trajectories dictionary
+        if (m_trajectories == null)
+            m_trajectories = new Dictionary<string, List<Vector3>>();
+        else
+            m_trajectories.Clear();
 
+        // create or clean the toggled trajectories dictionary
+        if (m_toggleTraj == null)
+            m_toggleTraj = new Dictionary<string, bool>();
+        else
+            m_toggleTraj.Clear();
+
+        // fill the the toggled trajectories dictionary
+        // and the trajectories dictionary
+        if(m_BodyJoints != null && m_animationClip != null)
+        {
+            // Get the Length of the current Animation
+            m_f_endTime = m_animationClip.length;
+            // Get the frame Duration of the current Animation
+            m_f_frameDuration = 1.0f / m_animationClip.frameRate;
+            
+            for (int i = 1; i < m_BodyJoints.Count(); i++)
+            {
+                // toggled trajectories
+                m_toggleTraj.Add(m_BodyJoints[i].name, true);
+                // trajectories
+                List<Vector3> points = new List<Vector3>();
+                for(float t = m_f_startTime;t < m_f_endTime;t += m_f_frameDuration)
+                {
+                    samplePosture(t);
+                    points.Add(m_BodyJoints[i].position);
+                }
+                m_trajectories.Add(m_BodyJoints[i].name, points);
+            }
+        }
+
+    }
+
+    public void GaussianAnim()
+    {
+        AnimationClip clip = new AnimationClip();  // comportera la copie de m_animationClip mais filtrer
+
+        // Copy the m_animationClip in the local variale clip
+        clip.legacy = m_animationClip.legacy;
+        foreach (EditorCurveBinding binding in AnimationUtility.GetCurveBindings(m_animationClip))
+        {
+            AnimationCurve curve = AnimationUtility.GetEditorCurve(m_animationClip, binding);
+
+            //TODO : editer chaque courbe ici avec
+            // Parcourir toute la courbe avec comme longueur : curve.length 
+            //  float v = curve.keys[time].value;
+            //  curve.MoveKey(time, new Keyframe(time, v));
+            int size = 5;
+            double[] gaussianClip = new double[curve.length];
+
+            for(int i = size;i < curve.length - size;i++)
+            {
+                double sumValues = 0, sumCoefs = 0;
+                for(int j = -size;j <= size;j++)
+                {
+                    double coef = (1.0 / System.Math.Sqrt(2.0 * System.Math.PI)) * 
+                                  System.Math.Exp(-(j * j) / 2.0);
+                    sumValues += coef * curve.keys[i + j].value;
+                    sumCoefs += coef;
+                }
+
+                gaussianClip[i] = sumValues / sumCoefs;
+            }
+
+            for(int i = size;i < curve.length - size;i++)
+            {
+                curve.MoveKey(i, new Keyframe(curve.keys[i].time, (float)gaussianClip[i]));
+                curve.SmoothTangents(i, 1f);
+            }
+
+            AnimationUtility.SetEditorCurve(clip, binding, curve);
+        }
+
+        // Si vous avez besoin de (quaternion+translation) il faut les regrouper les courbes
+        // il y a 7 courbes par articulations, par exemple pour le noeud "root" il y a 
+        // "rootT.x"  "rootT.y" "rootT.z" pour la translation
+        // "rootQ.x"  "rootQ.y" "rootQ.z" "rootQ.w" pour le quaternion
+        // Il faut donc regrouper ces 4 courbes en un tableau de quaternion
+
+        // Save the local variale clip
+        AssetDatabase.CreateAsset(clip, "Assets/Gaussian.anim");
     }
 
 
@@ -118,7 +223,7 @@ public class PlayAnimationEditor : EditorWindow
             return;
         }
         // Check if the current GameObject is active
-        if (!m_skeleton.active)
+        if (!m_skeleton.activeInHierarchy)
         {
             EditorGUILayout.HelpBox("Please select a GameObject that is active.", MessageType.Info);
             return;
@@ -154,12 +259,13 @@ public class PlayAnimationEditor : EditorWindow
             m_f_endTime = m_animationClip.length;
             // Get the frame Duration of the current Animation
             m_f_frameDuration = 1.0f / m_animationClip.frameRate;
+
             // An example for a Slider with change detect
             // So we need to call The  EditorGUI.BeginChangeCheck() in order to create a "Listener"
             EditorGUI.BeginChangeCheck();
             // Then we create the Object that we want to track some change on 
             m_f_time = EditorGUILayout.Slider("Time (seconds)", m_f_time, m_f_startTime, m_f_endTime);
-            // If the user has modified the Slider Precision here, we can detect it and call a fonction for example
+            // If the user has modified the Slider Precision here, we can detect it and call a function for example
             if (EditorGUI.EndChangeCheck())
                 samplePosture(m_f_time);
 
@@ -174,6 +280,10 @@ public class PlayAnimationEditor : EditorWindow
                 {
                     // Starts the Coroutine that will play the Animation
                     //Swing.Editor.EditorCoroutine.start(repeatAnimation(m_f_frameDuration));
+
+                    if (!AnimationMode.InAnimationMode())
+                        AnimationMode.StartAnimationMode();
+
                     // Coroutine is runnning
                     m_b_isRunning = true;
                 }
@@ -183,9 +293,19 @@ public class PlayAnimationEditor : EditorWindow
                 // Stop the Coroutine
                 if (GUILayout.Button("Stop Animation"))
                 {
-                    // Swing.Editor.EditorCoroutine.stop(repeatAnimation(m_f_frameDuration));
+                    //Swing.Editor.EditorCoroutine.stop(repeatAnimation(m_f_frameDuration));
+
+                    if (AnimationMode.InAnimationMode())
+                        AnimationMode.StopAnimationMode();
+                    m_f_time = m_f_startTime;
+
                     m_b_isRunning = false;
                 }
+            }
+
+            if (GUILayout.Button("Gaussian filter"))
+            {
+                GaussianAnim();
             }
 
 
@@ -194,6 +314,16 @@ public class PlayAnimationEditor : EditorWindow
             // Voir la doc : https://docs.unity3d.com/ScriptReference/EditorGUILayout.Toggle.html
             // Utilisez la variables : m_toggleTraj[m_BodyJoints[i].name]
 
+            EditorGUILayout.LabelField("Joints to display");
+
+            for (int i = 1;i < m_BodyJoints.Count;i++)
+            {
+                string name = m_BodyJoints[i].name;
+                EditorGUI.BeginChangeCheck(); // change listener
+                m_toggleTraj[name] = EditorGUILayout.Toggle(name, m_toggleTraj[name]);
+                if (EditorGUI.EndChangeCheck()) // the user use the toggle
+                    m_toggleTraj[name] = EditorGUILayout.Toggle(name, m_toggleTraj[name]); 
+            }
 
         }
 
@@ -212,9 +342,12 @@ public class PlayAnimationEditor : EditorWindow
         // TODO
         // Verifier que m_skeleton m_animationClip, m_b_isRunning sont init
         // modifier le temps : m_f_time
-        // appeler samplePosture qui est ue fonction un peu plus bas
-
-
+        // appeler samplePosture qui est une fonction un peu plus bas
+        if(m_skeleton != null && m_animationClip != null && m_b_isRunning)
+        {
+            m_f_time += m_f_frameDuration * m_f_scaleTime;
+            samplePosture(m_f_time);
+        }
 
         SceneView.RepaintAll();
     }

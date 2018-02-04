@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2017
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anim_Perso", "Anim_Perso.csproj", "{B87D58F3-1601-C134-EF04-1C165366F8A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anim_Perso.Plugins", "Anim_Perso.Plugins.csproj", "{11929F6A-5B29-4575-78B9-1298AEA8CB33}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anim_Perso.Editor.Plugins", "Anim_Perso.Editor.Plugins.csproj", "{8ACAC44D-9437-9461-FB5E-6B63BF9DB6A8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anim_Perso.Editor", "Anim_Perso.Editor.csproj", "{FAF3E0BA-53B7-D6C5-CAF6-4D23F160D50D}"
 EndProject
 Global
@@ -19,14 +15,6 @@ Global
 		{B87D58F3-1601-C134-EF04-1C165366F8A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B87D58F3-1601-C134-EF04-1C165366F8A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B87D58F3-1601-C134-EF04-1C165366F8A6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{11929F6A-5B29-4575-78B9-1298AEA8CB33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{11929F6A-5B29-4575-78B9-1298AEA8CB33}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{11929F6A-5B29-4575-78B9-1298AEA8CB33}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{11929F6A-5B29-4575-78B9-1298AEA8CB33}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8ACAC44D-9437-9461-FB5E-6B63BF9DB6A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8ACAC44D-9437-9461-FB5E-6B63BF9DB6A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8ACAC44D-9437-9461-FB5E-6B63BF9DB6A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8ACAC44D-9437-9461-FB5E-6B63BF9DB6A8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FAF3E0BA-53B7-D6C5-CAF6-4D23F160D50D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FAF3E0BA-53B7-D6C5-CAF6-4D23F160D50D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAF3E0BA-53B7-D6C5-CAF6-4D23F160D50D}.Release|Any CPU.ActiveCfg = Release|Any CPU

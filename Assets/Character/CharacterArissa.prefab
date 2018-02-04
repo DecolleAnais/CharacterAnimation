@@ -328,13 +328,15 @@ GameObject:
   - component: {fileID: 95270256653133912}
   - component: {fileID: 114408016072319444}
   - component: {fileID: 114976482710743694}
+  - component: {fileID: 143819974578149962}
+  - component: {fileID: 136373900975492518}
   m_Layer: 0
   m_Name: CharacterArissa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1274073255851886
 GameObject:
   m_ObjectHideFlags: 1
@@ -2500,6 +2502,7 @@ Camera:
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
@@ -2741,7 +2744,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ikActive: 1
-  groundObj: {fileID: 0}
+  offsetY: -200
 --- !u!124 &124802507023733664
 Behaviour:
   m_ObjectHideFlags: 1
@@ -2800,6 +2803,19 @@ CapsuleCollider:
   m_Height: 0.41357368
   m_Direction: 1
   m_Center: {x: 0, y: -0.20678684, z: 0}
+--- !u!136 &136373900975492518
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1266926664882028}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.21
+  m_Height: 1.6
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.94, z: -0.04}
 --- !u!136 &136529942723187742
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -3171,6 +3187,23 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.002458565, y: 0.42819256, z: -0.18958135}
     m_Extent: {x: 0.073520295, y: 0.38842404, z: 0.073479995}
   m_DirtyAABB: 0
+--- !u!143 &143819974578149962
+CharacterController:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1266926664882028}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 1.8
+  m_Radius: 0.1
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.14
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!144 &144043277224132354
 CharacterJoint:
   m_ObjectHideFlags: 1
